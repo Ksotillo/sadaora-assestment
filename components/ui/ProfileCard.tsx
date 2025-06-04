@@ -1,7 +1,1 @@
-interface ProfileCardProps {
-  profile: Profile
-  showStats?: boolean
-  onFollow?: (userId: string, isFollowing: boolean) => void
-  isLoading?: boolean
-  onInterestClick?: (interest: string) => void
-} 
+// This file is a placeholder - actual ProfileCard is in components/feed/ProfileCard.tsx 

@@ -7,12 +7,13 @@ import { ApiResponse, Profile } from '../../../../types'
 // GET /api/profiles/[userId] - Get a specific profile
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const { userId: currentUserId } = await auth()
+    const { userId } = await params
     
-    const profile = await getProfileWithStats(params.userId, currentUserId || undefined)
+    const profile = await getProfileWithStats(userId, currentUserId || undefined)
     
     if (!profile) {
       return NextResponse.json<ApiResponse<null>>(
@@ -36,10 +37,11 @@ export async function GET(
 // PUT /api/profiles/[userId] - Update a profile
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const { userId: currentUserId } = await auth()
+    const { userId } = await params
     
     if (!currentUserId) {
       return NextResponse.json<ApiResponse<null>>(
@@ -49,7 +51,7 @@ export async function PUT(
     }
 
     // Users can only update their own profile
-    if (currentUserId !== params.userId) {
+    if (currentUserId !== userId) {
       return NextResponse.json<ApiResponse<null>>(
         { error: 'Forbidden' },
         { status: 403 }
@@ -72,9 +74,9 @@ export async function PUT(
     // Update basic profile data
     let updatedProfile: Profile
     if (Object.keys(updateData).length > 0) {
-      updatedProfile = await updateProfile(params.userId, updateData)
+      updatedProfile = await updateProfile(userId, updateData)
     } else {
-      const profile = await getProfile(params.userId)
+      const profile = await getProfile(userId)
       if (!profile) {
         return NextResponse.json<ApiResponse<null>>(
           { error: 'Profile not found' },
@@ -97,8 +99,8 @@ export async function PUT(
         }
 
         // Upload new avatar
-        const avatarUrl = await uploadImageToS3(avatar, params.userId)
-        updatedProfile = await updateProfileAvatar(params.userId, avatarUrl)
+        const avatarUrl = await uploadImageToS3(avatar, userId)
+        updatedProfile = await updateProfileAvatar(userId, avatarUrl)
       } catch (uploadError) {
         console.error('Error uploading avatar:', uploadError)
         return NextResponse.json<ApiResponse<Profile>>({
@@ -124,10 +126,11 @@ export async function PUT(
 // DELETE /api/profiles/[userId] - Delete a profile
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const { userId: currentUserId } = await auth()
+    const { userId } = await params
     
     if (!currentUserId) {
       return NextResponse.json<ApiResponse<null>>(
@@ -137,7 +140,7 @@ export async function DELETE(
     }
 
     // Users can only delete their own profile
-    if (currentUserId !== params.userId) {
+    if (currentUserId !== userId) {
       return NextResponse.json<ApiResponse<null>>(
         { error: 'Forbidden' },
         { status: 403 }
@@ -145,7 +148,7 @@ export async function DELETE(
     }
 
     // Get profile to check for avatar
-    const profile = await getProfile(params.userId)
+    const profile = await getProfile(userId)
     if (!profile) {
       return NextResponse.json<ApiResponse<null>>(
         { error: 'Profile not found' },
@@ -163,7 +166,7 @@ export async function DELETE(
     }
 
     // Delete the profile
-    await deleteProfile(params.userId)
+    await deleteProfile(userId)
 
     return NextResponse.json<ApiResponse<null>>({
       message: 'Profile deleted successfully'
