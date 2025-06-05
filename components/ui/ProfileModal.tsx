@@ -170,8 +170,8 @@ const ProfileModal = ({ isOpen, onClose, userId }: ProfileModalProps) => {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-md bg-white rounded-t-3xl max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm pb-20">
+      <div className="w-full max-w-md bg-white rounded-t-3xl max-h-[75vh] overflow-hidden">
         {/* Modal Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-gray-900">Profile</h2>
@@ -185,7 +185,7 @@ const ProfileModal = ({ isOpen, onClose, userId }: ProfileModalProps) => {
         </div>
 
         {/* Modal Content */}
-        <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
+        <div className="overflow-y-auto max-h-[calc(75vh-80px)]">
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
